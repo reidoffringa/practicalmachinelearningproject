@@ -1,7 +1,7 @@
 ---
-title: "Class Project"
+title: "Practical Machine Learning Project"
 author: "Reid the scientist"
-date: "September 19, 2014"
+date: "September 21, 2014"
 output: html_document
 ---
 
@@ -67,6 +67,7 @@ predict_Test<-predict(modelFitGBM_noPCA, test1)
 
 ```
 
+
 #####Let's create some confusion matrixes (matrices?)
 ######First, for the training dataset
 ```{r, cache=TRUE}
@@ -78,15 +79,29 @@ tablePretest<-table(predict_pretest, p1$classe)
 confusionMatrix(tableTrain)
 ```
 
+####In sample error rate: 0.007
+The in-sample Accuracy is 0.993, or 99.3%. Not bad!
+So, the in-sample error is about 0.007 or 0.7%. 
 
-######Then again for the first *pretest* dataset
+Do the authors describe what they expect the out of sample error to be and estimate the error appropriately with cross-validation?
+
+#### Now let's check out the *pretest* dataset, to estimate out-of-sample error. 
+Here, we're using the same model as above to estaimate the classes on a subsample of the training set. This subsample, which I'm calling the pretest, was not used to estimate the model. 
+
+#### Confusion Matrix!
+#####For brevity, I'm just showing the Overall Statistics section 
+
 ```{r, cache=TRUE}
-confusionMatrix(tablePretest)[2]
+confusionMatrix(tablePretest)[3]
 
 ```
 
+###Out of sample error rate: 0.0118
 
-####They look really great! Based on the above model, here are the predictions for the test dataset:
+Out of sample accuracy estimated at 0.9882, or 98.82%
+So that means the out-of-sample error is about 0.0118, or 1.18%
+
+#### Based on the above model, here are the predictions for the test dataset:
 
 ```{r, cache=TRUE}
 
