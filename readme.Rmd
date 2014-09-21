@@ -4,3 +4,5 @@ author: "Reid (me)"
 date: "September 21, 2014"
 output: html_document
 ---
+
+Just check out project2.Rmd and please ignore testing.Rmd 
