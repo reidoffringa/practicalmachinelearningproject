@@ -1,0 +1,112 @@
+---
+title: "Class Project"
+author: "Reid"
+date: "September 19, 2014"
+output: html_document
+---
+
+
+First, let's download the data
+
+```{r}
+library(modeest)
+library(caret)
+library()
+setwd("/Users/Reid/OneDrive/R/Coursera/course materials/practical machine learning/project/")
+
+training<-read.csv("pml-training.csv")
+
+testing<-read.csv("pml-testing.csv")
+
+##get variable names of the mostly-NA variables
+````
+
+#Preprocessing: remove 
+
+````{r}
+
+modes<-apply(training, 2,mfv)
+GoAway<-(is.na(modes))
+train1<-training[, !GoAway]
+
+````
+
+````{r}
+
+
+#Next, let's drop user names and row numbers
+t1<-training[, -(1:2)]
+test1<-testing[, -(1:2)]
+
+##then, isolate the numeric columns:
+
+nums <- sapply(t1, is.numeric)
+integers <- sapply(t1, is.integer)
+factors <- sapply(t1, is.factor)
+characters<-sapply(t1, is.character)
+
+tn<-t1[ , nums]
+ti<-t1[ , integers]
+tf<-t1[ , factors]
+ti2<-ti[, -(1:7)]
+t2b<-t1[ , -nums]
+t3<-cbind(tn, ti2)
+
+
+testn<-test1[ , nums]
+testi<-test1[ , integers]
+testi2<-testi[, -(1:7)]
+test2b<-test1[ , -nums]
+
+testi2a<- apply(testi2, 2, function(x) as.numeric(as.character(x)))
+testi2a<- as.data.frame(testi2a)
+test3<-cbind(testn, testi2a)
+test3<-as.data.frame(test3)
+
+t4<-t3[, -which(colSums(is.na(t3)) > 10000)]
+test4<-test3[, -which(colSums(is.na(t3)) > 10)]
+
+
+
+```
+
+```{r}
+
+require(caret)
+PCA2<-preProcess(t4, method="pca", thresh=0.8)
+
+trainPCA <- predict(PCA2,t4)
+testPCA  <- predict(PCA2,test4)
+
+#Add some potentially important factors back in
+trainPCA2<-cbind(trainPCA, training$cvtd_timestamp, training$new_window)
+
+require(data.table)
+setnames(trainPCA2, "training$cvtd_timestamp", "cvtd_timestamp")
+setnames(trainPCA2, "training$new_window", "new_window")
+    
+testPCA2<-cbind(testPCA, testing$cvtd_timestamp, testing$new_window)
+
+setnames(testPCA2, "testing$cvtd_timestamp", "cvtd_timestamp")
+setnames(testPCA2, "testing$new_window", "new_window")
+
+modelFitPC <- train(training$classe~ .,method="multinom", data=trainPCA2)
+modelFitRF <- train(training$classe~ .,method="rf", data=trainPCA2)
+modelFitGBM <- train(training$classe~ .,method="gbm", data=trainPCA2)
+
+train_pred_GBM<-predict(modelFitGBM, trainPCA)
+GBMTable<-table(train_pred_GBM, training$classe)
+confusionMatrix(GBMTable)
+
+train_pred_logistic<-predict(modelFitPC, trainPCA)
+logisticTable<-table(train_pred_logistic, training$classe)
+confusionMatrix(logisticTable)
+
+predict_logistic<-predict(modelFitPC, testPCA)
+predict_GM<-predict(modelFitGBM, testPCA)
+
+confusionMatrix(GBMTable)
+
+````
+
+

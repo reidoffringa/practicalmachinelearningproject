@@ -1,0 +1,96 @@
+---
+title: "Class Project"
+author: "Reid the scientist"
+date: "September 19, 2014"
+output: html_document
+---
+
+###Using the Generalized Boosted Regression Model (GBM) to predict a multigroup categorical variable.  
+
+####First, let's read in the data
+
+```{r, cache=TRUE, results='hide'}
+library(modeest)
+library(caret)
+require(data.table)
+
+setwd("/Users/Reid/OneDrive/R/Coursera/course materials/practical machine learning/project/")
+
+training<-read.csv("pml-training.csv", na.strings=c("NA",""))
+testing<-read.csv("pml-testing.csv", na.strings=c("NA",""))
+
+inTrain <- createDataPartition(training$classe, p=0.75, list = FALSE)
+train <- training[inTrain,]
+pretest <- training[-inTrain,]
+````
+
+####Next, let's drop the annoying variables, 
+
+######names, row numbers and timestamps that I found didn't help much. 
+
+####Also, dropping all the rows with more than 10k NA values. 
+````{r, cache=TRUE}
+t1<-train[, -(1:6)]
+p1<-pretest[, -(1:6)]
+test1<-testing[, -(1:6)]
+
+#this names the columns with lots of NAs
+getrid<-which(colSums(is.na(t1)) > 10000)
+
+#this removes those columns
+t2<-t1[, -getrid]
+p1<-p1[, -getrid]
+test1<-test1[, -getrid]
+
+#don't forget to get rid of the classe var!
+
+t3<-t2[, -54]
+p3<-p1[, -54]
+
+
+```
+
+#####NOTE:
+I first tied reducing the variables with a PCA, but it was messy and I only got
+71% accuracy. So, then I tried a gbm model with the raw data 
+(the exact model, of course, took some trial and error). Random forests took 
+way too long and a multinomial logistic regression was not accurate at all.  
+
+```{r, cache=TRUE, results='hide'}
+
+#testing this model now
+modelFitGBM_noPCA <- train(t2$classe~ .,method="gbm", data=t3)
+
+predict_train<-predict(modelFitGBM_noPCA, t3)
+predict_pretest<-predict(modelFitGBM_noPCA, p3)
+predict_Test<-predict(modelFitGBM_noPCA, test1)
+
+```
+
+#####Let's create some confusion matrixes (matrices?)
+######First, for the training dataset
+```{r, cache=TRUE}
+
+tableTrain<-table(predict_train, t2$classe)
+tablePretest<-table(predict_pretest, p1$classe)
+#tableTest<-table(predict_train, test1$classe)
+
+confusionMatrix(tableTrain)
+```
+
+
+######Then again for the first *pretest* dataset
+```{r, cache=TRUE}
+confusionMatrix(tablePretest)[2]
+
+```
+
+
+####They look really great! Based on the above model, here are the predictions for the test dataset:
+
+```{r, cache=TRUE}
+
+predict_Test
+
+```
+
