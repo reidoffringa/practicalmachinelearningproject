@@ -4,5 +4,9 @@ author: "Reid (me)"
 date: "September 21, 2014"
 output: html_document
 ---
+For the markdown file, just check out project2.Rmd and please ignore testing.Rmd 
 
-Just check out project2.Rmd and please ignore testing.Rmd 
+It takes a while to 'knit' everything into an html document, so please just
+check out project2.html to save some time. 
+
+Otherwise, check out my Rpub: http://rpubs.com/reidoffringa/29941

@@ -154,9 +154,15 @@ confusionMatrix(tableTrain)</code></pre>
 </div>
 <div id="then-again-for-the-first-pretest-dataset" class="section level6">
 <h6>Then again for the first <em>pretest</em> dataset</h6>
-<pre class="r"><code>confusionMatrix(tablePretest)[1]</code></pre>
-<pre><code>## $positive
-## NULL</code></pre>
+<pre class="r"><code>confusionMatrix(tablePretest)[2]</code></pre>
+<pre><code>## $table
+##                
+## predict_pretest    A    B    C    D    E
+##               A 1392    7    0    2    0
+##               B    3  931    8    1    3
+##               C    0   10  844    8    3
+##               D    0    1    3  791    7
+##               E    0    0    0    2  888</code></pre>
 </div>
 </div>
 </div>
